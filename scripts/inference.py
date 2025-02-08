@@ -21,6 +21,26 @@ from latentsync.pipelines.lipsync_pipeline import LipsyncPipeline
 from diffusers.utils.import_utils import is_xformers_available
 from accelerate.utils import set_seed
 from latentsync.whisper.audio2feature import Audio2Feature
+import cv2
+import numpy as np
+from scripts.superres import super_resolve
+
+# New func process_frame added for comparing input-generated frmae ratio
+
+# def process_frame(input_frame, generated_part, superres_model):
+#     """
+#     Compares resolution of generated_part with input_frame and applies super-resolution if needed.
+#     """
+#     h1, w1 = generated_part.shape[:2]
+#     h2, w2 = input_frame.shape[:2]
+    
+#     scale_w = w2 / w1
+#     scale_h = h2 / h1
+    
+#     if scale_w > 1.0 or scale_h > 1.0:  # Apply super-resolution only if needed
+#         generated_part = super_resolve(generated_part, model=superres_model)
+    
+#     return generated_part
 
 
 def main(config, args):
@@ -73,6 +93,9 @@ def main(config, args):
 
     print(f"Initial seed: {torch.initial_seed()}")
 
+    if args.superres:
+        super_resolve(args.video_path, args.audio_path, args.video_out_path, config["run"]["guidance_scale"], config["run"]["inference_steps"], args.seed,args.superres)
+
     pipeline(
         video_path=args.video_path,
         audio_path=args.audio_path,
@@ -84,6 +107,8 @@ def main(config, args):
         weight_dtype=dtype,
         width=config.data.resolution,
         height=config.data.resolution,
+        # adding model
+        superres=args.superres
     )
 
 
@@ -97,8 +122,12 @@ if __name__ == "__main__":
     parser.add_argument("--inference_steps", type=int, default=20)
     parser.add_argument("--guidance_scale", type=float, default=1.0)
     parser.add_argument("--seed", type=int, default=1247)
+    parser.add_argument('--superres', type=str, choices=['GFPGAN', 'CodeFormer'], default=None,
+                        help='Select super-resolution model if needed')
     args = parser.parse_args()
 
     config = OmegaConf.load(args.unet_config_path)
 
     main(config, args)
+
+
