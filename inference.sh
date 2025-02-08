@@ -8,3 +8,13 @@ python -m scripts.inference \
     --video_path "assets/demo1_video.mp4" \
     --audio_path "assets/demo1_audio.wav" \
     --video_out_path "video_out.mp4"
+
+# Calling the super-resolution script
+python -m scripts.superres \
+    --video_path "assets/lipsynced.mp4" \
+    --audio_path "assets/demo1_audio.wav" \
+    --output_path "assets/" \
+    --guidance_scale 1.5 \
+    --inference_steps 20 \
+    --seed 1247 \
+    --superres "GFPGAN"  # or "CodeFormer"
