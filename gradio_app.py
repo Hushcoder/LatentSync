@@ -4,6 +4,7 @@ from scripts.inference import main
 from omegaconf import OmegaConf
 import argparse
 from datetime import datetime
+from scripts.superres import super_resolve
 
 CONFIG_PATH = Path("configs/unet/second_stage.yaml")
 CHECKPOINT_PATH = Path("checkpoints/latentsync_unet.pt")
@@ -52,9 +53,8 @@ def process_video(
         print(f"Error during processing: {str(e)}")
         raise gr.Error(f"Error during processing: {str(e)}")
 
-
 def create_args(
-    video_path: str, audio_path: str, output_path: str, inference_steps: int, guidance_scale: float, seed: int
+    video_path: str, audio_path: str, output_path: str, superres: str, inference_steps: int, guidance_scale: float, seed: int
 ) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--inference_ckpt_path", type=str, required=True)
@@ -64,6 +64,9 @@ def create_args(
     parser.add_argument("--inference_steps", type=int, default=20)
     parser.add_argument("--guidance_scale", type=float, default=1.0)
     parser.add_argument("--seed", type=int, default=1247)
+    # -Superres Added here
+    parser.add_argument('--superres', type=str, choices=['GFPGAN', 'CodeFormer'], default=None,
+                        help='Select super-resolution model if needed')
 
     return parser.parse_args(
         [
@@ -83,7 +86,6 @@ def create_args(
             str(seed),
         ]
     )
-
 
 # Create Gradio interface
 with gr.Blocks(title="LatentSync Video Processing") as demo:
@@ -131,7 +133,9 @@ with gr.Blocks(title="LatentSync Video Processing") as demo:
                 seed = gr.Number(value=1247, label="Random Seed", precision=0)
 
             process_btn = gr.Button("Process Video")
-
+            # for resolution
+            superres_model = gr.Radio(label="Super Resolution Model", choices=["GFPGAN", "CodeFormer"], value="GFPGAN")
+            process_resolve = gr.Button("Resolve Video")
         with gr.Column():
             video_output = gr.Video(label="Output Video")
 
@@ -156,5 +160,19 @@ with gr.Blocks(title="LatentSync Video Processing") as demo:
         outputs=video_output,
     )
 
+    process_resolve.click(
+        fn=super_resolve,
+        inputs=[
+            video_input,
+            audio_input, 
+            guidance_scale, 
+            inference_steps, 
+            seed,
+            superres_model,
+            ], 
+            outputs=video_output,
+    )
+
 if __name__ == "__main__":
     demo.launch(inbrowser=True, share=True)
+
