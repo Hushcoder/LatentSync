@@ -15,6 +15,7 @@ def apply_super_resolution(image, model):
     else:
         return image  # No super-resolution applied
     
+    # Enhanced image 
     return sr_model.enhance(image)
 
 def super_resolve(video_path, audio_path, output_path, guidance_scale, inference_steps, seed, superres_model):

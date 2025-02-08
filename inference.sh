@@ -17,4 +17,4 @@ python -m scripts.superres \
     --guidance_scale 1.5 \
     --inference_steps 20 \
     --seed 1247 \
-    --superres "GFPGAN"  # or "CodeFormer"
+    --superres GFPGAN CodeFormer

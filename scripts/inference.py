@@ -92,7 +92,8 @@ def main(config, args):
         torch.seed()
 
     print(f"Initial seed: {torch.initial_seed()}")
-
+    
+    # super-resolve
     if args.superres:
         super_resolve(args.video_path, args.audio_path, args.video_out_path, config["run"]["guidance_scale"], config["run"]["inference_steps"], args.seed,args.superres)
 

@@ -159,7 +159,8 @@ with gr.Blocks(title="LatentSync Video Processing") as demo:
         ],
         outputs=video_output,
     )
-
+    
+    # resolution through button and model choice
     process_resolve.click(
         fn=super_resolve,
         inputs=[

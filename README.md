@@ -126,6 +126,17 @@ Run the script for inference:
 ./inference.sh
 ```
 
+### Run Inference for Super-Resolution
+
+### 1. With GFPGAN Model
+```bash
+   python inference.py --superres GFPGAN
+```
+### 2. With CodeFormer Model
+```bash
+   python inference.py --superres CodeFormer
+```
+
 You can change the parameters `inference_steps` and `guidance_scale` to see more results.
 
 ## 🔄 Data Processing Pipeline
